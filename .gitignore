@@ -1,0 +1,10 @@
+﻿# 个人配置与日志（含本地路径，不入库）
+config.json
+debug.log
+
+# Python
+__pycache__/
+*.pyc
+
+# 更新脚本临时文件
+_update_toolbox.bat
