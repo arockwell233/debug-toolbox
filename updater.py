@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 在线更新模块
 ============
@@ -49,7 +49,8 @@ def fetch_remote_version(repo, timeout=30):
     """读取远程 version.json，返回版本字符串；失败返回 None。"""
     try:
         data = _api_get(_contents_url(repo, "version.json"), timeout)
-        content = base64.b64decode(data["content"].replace("\n", "")).decode("utf-8")
+        raw = base64.b64decode(data["content"].replace("\n", ""))
+        content = raw.decode("utf-8-sig")  # utf-8-sig 兼容 BOM
         info = json.loads(content)
         return str(info.get("version", "")).strip()
     except Exception:

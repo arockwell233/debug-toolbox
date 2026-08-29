@@ -1,8 +1,8 @@
-﻿{
+{
   "app_name": "调试工具箱",
   "window": { "width": 1024, "height": 680 },
   "scan_base_dir": "",
-  "update": { "repo": "arockwell233/debug-toolbox", "auto_check": false },
+  "update": { "repo": "arockwell233/debug-toolbox", "auto_check": true },
   "categories": [
     { "name": "FTU", "color": "#4a90d9" },
     { "name": "路由器", "color": "#e67e22" },

@@ -152,7 +152,7 @@ class Config:
             "app_name": "调试工具箱",
             "window": {"width": 1024, "height": 680},
             "scan_base_dir": "",
-            "update": {"repo": "arockwell233/debug-toolbox", "auto_check": False},
+            "update": {"repo": "arockwell233/debug-toolbox", "auto_check": True},
             "categories": [
                 {"name": "FTU", "color": "#4a90d9"},
                 {"name": "路由器", "color": "#e67e22"},
@@ -780,23 +780,9 @@ class ToolboxApp(tk.Tk):
         threading.Thread(target=worker, daemon=True).start()
 
     def _prompt_update(self, version):
-        if messagebox.askyesno("发现新版本", "发现新版本 v%s，是否立即在线更新？\n（更新后程序会自动重启）" % version, parent=self):
-            self._run_update_flow()
-
-    def _run_update_flow(self):
-        def worker():
-            from updater import download_and_apply
+        if messagebox.askyesno("发现新版本", "发现新版本 v%s，是否打开 GitHub 下载页？\n（下载新版后覆盖当前程序即可）" % version, parent=self):
             repo = (self.config.data.get("update", {}) or {}).get("repo", "arockwell233/debug-toolbox")
-            ok, msg = download_and_apply(repo)
-            if ok:
-                self.after(0, lambda: self._finish_update())
-            else:
-                self.after(0, lambda: messagebox.showerror("更新失败", msg, parent=self))
-        threading.Thread(target=worker, daemon=True).start()
-
-    def _finish_update(self):
-        messagebox.showinfo("在线更新", "新版已下载，程序即将自动重启。", parent=self)
-        self.destroy()
+            webbrowser.open("https://github.com/%s" % repo)
 
     def _settings_button(self):
         SettingsDialog(self, self.config)
@@ -1250,7 +1236,7 @@ class SettingsDialog(tk.Toplevel):
                                     fg="#ffffff", relief="flat", cursor="hand2", padx=12, pady=3,
                                     font=(FONT, 9))
         self.update_btn.pack(side="left", padx=10)
-        self.do_update_btn = tk.Button(r, text="立即更新", command=self._do_update, bg="#e67e22",
+        self.do_update_btn = tk.Button(r, text="下载新版", command=self._do_update, bg="#e67e22",
                                        fg="#ffffff", relief="flat", cursor="hand2", padx=12, pady=3,
                                        font=(FONT, 9), state="disabled")
         self.do_update_btn.pack(side="left")
@@ -1305,26 +1291,9 @@ class SettingsDialog(tk.Toplevel):
     def _do_update(self):
         if not self._found_version:
             return
-        if not messagebox.askyesno("在线更新",
-                                   "将下载 v%s 并自动替换当前程序，替换后自动重启。\n确定继续吗？"
-                                   % self._found_version, parent=self):
-            return
-        self.do_update_btn.config(state="disabled")
-        self.update_status.config(text="正在下载新版…")
-        threading.Thread(target=self._update_worker, daemon=True).start()
-
-    def _update_worker(self):
-        from updater import download_and_apply
         repo = self._update_repo_var.get().strip() or "arockwell233/debug-toolbox"
-        ok, msg = download_and_apply(repo)
-        if ok:
-            self.after(0, lambda: self._finish_update())
-        else:
-            self.after(0, lambda: self._show_check_result(None, msg))
-
-    def _finish_update(self):
-        messagebox.showinfo("在线更新", "新版已下载，程序即将自动重启。", parent=self)
-        self.master_app.destroy()
+        webbrowser.open("https://github.com/%s" % repo)
+        self.update_status.config(text="已在浏览器打开下载页，下载新版后覆盖当前程序即可。")
 
     def _save(self):
         name = self._name_var.get().strip() or "调试工具箱"
